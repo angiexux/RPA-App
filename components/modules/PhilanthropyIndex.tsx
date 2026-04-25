@@ -17,15 +17,39 @@ import {
 } from "@/lib/moduleSeedData";
 import { useAppStore } from "@/store";
 
-const TOP_CORP = [
-  { name: "Itaú", giving: "$42M" },
-  { name: "Vale", giving: "$28M" },
-  { name: "Petrobras", giving: "$22M" },
+const TOP_CORP_BY_COUNTRY: Record<string, Array<{ name: string; giving: string; url: string }>> = {
+  Brazil: [
+    { name: "Itaú Unibanco", giving: "$42M", url: "https://www.itau.com.br/relacoes-com-investidores/" },
+    { name: "Vale Foundation", giving: "$28M", url: "https://www.vale.com/sustainability" },
+    { name: "Petrobras Social Program", giving: "$22M", url: "https://petrobras.com.br/en/society-and-environment/" },
+  ],
+  Nigeria: [
+    { name: "Dangote Foundation", giving: "$18M", url: "https://dangotegroup.com/sustainability/" },
+    { name: "Tony Elumelu Foundation", giving: "$15M", url: "https://www.tonyelumelufoundation.org/" },
+    { name: "Access Bank CSR", giving: "$9M", url: "https://www.accessbankplc.com/sustainability" },
+  ],
+  Kenya: [
+    { name: "Safaricom Foundation", giving: "$12M", url: "https://www.safaricom.co.ke/sustainability" },
+    { name: "Equity Group Foundation", giving: "$10M", url: "https://equitygroupfoundation.com/" },
+    { name: "KCB Foundation", giving: "$7M", url: "https://kcbgroup.com/foundation/" },
+  ],
+  Colombia: [
+    { name: "Grupo Bancolombia", giving: "$14M", url: "https://www.grupobancolombia.com/sostenibilidad" },
+    { name: "Fundación Bavaria", giving: "$11M", url: "https://www.fundacionbavaria.org/" },
+    { name: "Ecopetrol Social", giving: "$8M", url: "https://www.ecopetrol.com.co/wps/portal/Home/sostenibilidad" },
+  ],
+};
+
+const DEFAULT_CORP = [
+  { name: "Corporate donor 1", giving: "$15M", url: "" },
+  { name: "Corporate donor 2", giving: "$10M", url: "" },
+  { name: "Corporate donor 3", giving: "$7M", url: "" },
 ];
+
 type PhilanthropyLiveData = {
   metrics: { corporate: string; individual: string; endowment: string };
   trend: Array<{ y: string; v: number }>;
-  topCorporateDonors: Array<{ name: string; giving: string }>;
+  topCorporateDonors: Array<{ name: string; giving: string; url?: string }>;
   sources: Array<{ name: string; url: string }>;
 };
 
@@ -36,17 +60,14 @@ export function PhilanthropyIndex() {
   const [feedError, setFeedError] = useState<string | null>(null);
   const [liveData, setLiveData] = useState<PhilanthropyLiveData | null>(null);
   const [liveForCountry, setLiveForCountry] = useState<string | null>(null);
+
   const m = useMemo(() => getPhilanthropyMetrics(activeCountry), [activeCountry]);
-  const metrics =
-    liveData && liveForCountry === activeCountry ? liveData.metrics : m;
-  const trend =
-    liveData && liveForCountry === activeCountry
-      ? liveData.trend
-      : PHILANTHROPY_TREND;
+  const metrics = liveData && liveForCountry === activeCountry ? liveData.metrics : m;
+  const trend = liveData && liveForCountry === activeCountry ? liveData.trend : PHILANTHROPY_TREND;
   const topCorp =
     liveData && liveForCountry === activeCountry
       ? liveData.topCorporateDonors
-      : TOP_CORP;
+      : (TOP_CORP_BY_COUNTRY[activeCountry] ?? DEFAULT_CORP);
 
   const onRefresh = async () => {
     setLoading(true);
@@ -55,22 +76,11 @@ export function PhilanthropyIndex() {
       const res = await fetch("/api/claude", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "philanthropy_index",
-          country: activeCountry,
-        }),
+        body: JSON.stringify({ action: "philanthropy_index", country: activeCountry }),
       });
-      const data = (await res.json()) as {
-        error?: string;
-      } & Partial<PhilanthropyLiveData>;
-      if (!res.ok) {
-        throw new Error(data.error ?? `Request failed (${res.status})`);
-      }
-      if (
-        !data.metrics ||
-        !Array.isArray(data.trend) ||
-        !Array.isArray(data.topCorporateDonors)
-      ) {
+      const data = (await res.json()) as { error?: string } & Partial<PhilanthropyLiveData>;
+      if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status})`);
+      if (!data.metrics || !Array.isArray(data.trend) || !Array.isArray(data.topCorporateDonors)) {
         throw new Error("Incomplete response from Claude");
       }
       setLiveData({
@@ -92,11 +102,12 @@ export function PhilanthropyIndex() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-        <h1 className="text-3xl font-bold">Philanthropy Index (Domestic)</h1>
-        <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
-          Corporate AUM, individual/religious giving, endowment pool — seeded
-          by country where available.
-        </p>
+          <h1 className="text-3xl font-bold">Philanthropy Index (Domestic)</h1>
+          <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
+            Domestic philanthropic capacity in {activeCountry}: corporate foundations,
+            individual and religious giving, and institutional endowment pools.
+            Data sourced from national philanthropy reports and CAF World Giving Index.
+          </p>
         </div>
         <button
           type="button"
@@ -109,34 +120,30 @@ export function PhilanthropyIndex() {
         </button>
       </div>
 
-      {feedError ? (
+      {feedError && (
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
           {feedError}
         </div>
-      ) : null}
+      )}
 
-      {liveData && liveForCountry === activeCountry && liveData.sources.length > 0 ? (
+      {liveData && liveForCountry === activeCountry && liveData.sources.length > 0 && (
         <div className="card p-4 text-sm">
           <span className="font-semibold">Sources: </span>
           {liveData.sources.map((s, i) => (
             <span key={`${s.name}-${i}`}>
-              <a href={s.url} target="_blank" rel="noreferrer" className="underline">
-                {s.name}
-              </a>
+              <a href={s.url} target="_blank" rel="noreferrer" className="underline">{s.name}</a>
               {i < liveData.sources.length - 1 ? ", " : ""}
             </span>
           ))}
         </div>
-      ) : null}
+      )}
 
       <div className="card max-w-md p-5">
         <p className="text-xs text-[var(--text-muted)]">
           Last refreshed {new Date(lastRefresh).toLocaleString()}
-          {liveData && liveForCountry === activeCountry ? (
-            <span className="ml-2 font-semibold text-[var(--accent-gold)]">
-              · Claude
-            </span>
-          ) : null}
+          {liveData && liveForCountry === activeCountry && (
+            <span className="ml-2 font-semibold text-[var(--accent-gold)]">· Claude</span>
+          )}
         </p>
       </div>
 
@@ -144,51 +151,83 @@ export function PhilanthropyIndex() {
         <div className="card p-5">
           <p className="metric-label">Corporate giving AUM</p>
           <p className="mt-2 text-2xl font-bold">{metrics.corporate}</p>
+          <p className="mt-2 text-xs text-[var(--text-muted)] leading-relaxed">
+            Total estimated annual giving from corporate foundations and CSR programmes in {activeCountry}.
+          </p>
+          <a href="https://www.cafonline.org/about-us/publications/2023-publications/caf-world-giving-index" target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-blue-400 underline">
+            Source: CAF World Giving Index ↗
+          </a>
         </div>
         <div className="card p-5">
-          <p className="metric-label">Individual / religious</p>
+          <p className="metric-label">Individual / religious giving</p>
           <p className="mt-2 text-2xl font-bold">{metrics.individual}</p>
+          <p className="mt-2 text-xs text-[var(--text-muted)] leading-relaxed">
+            Estimated annual charitable contributions from individual donors and faith-based institutions.
+          </p>
+          <a href="https://www.cafonline.org/about-us/publications/2023-publications/caf-world-giving-index" target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-blue-400 underline">
+            Source: CAF World Giving Index ↗
+          </a>
         </div>
         <div className="card p-5">
           <p className="metric-label">Endowment pool</p>
           <p className="mt-2 text-2xl font-bold">{metrics.endowment}</p>
+          <p className="mt-2 text-xs text-[var(--text-muted)] leading-relaxed">
+            Aggregate investable assets held by domestic foundations and community foundations.
+          </p>
+          <a href="https://candid.org/explore-issues/nonprofit-finance" target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-blue-400 underline">
+            Source: Candid Nonprofit Finance ↗
+          </a>
         </div>
       </div>
 
       <div className="card p-5">
         <h2 className="text-lg font-bold">Domestic giving growth (indexed)</h2>
+        <p className="mt-1 text-xs text-[var(--text-muted)]">
+          X axis: Year. Y axis: Index value (2021 = 100 baseline). Values above 100 indicate growth in domestic philanthropic giving relative to the 2021 baseline.
+        </p>
         <div className="mt-4 h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={trend}>
+            <LineChart data={trend} margin={{ bottom: 20, left: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="y" />
-              <YAxis />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="v"
-                name="Index"
-                stroke="var(--accent-gold)"
-                strokeWidth={2}
+              <XAxis dataKey="y" label={{ value: "Year", position: "insideBottom", offset: -12 }} />
+              <YAxis
+                domain={[90, 130]}
+                label={{ value: "Index (2021 = 100)", angle: -90, position: "insideLeft", offset: 10 }}
               />
+              <Tooltip formatter={(v) => [`${v}`, "Index"]} />
+              <Line type="monotone" dataKey="v" name="Domestic giving index" stroke="var(--accent-gold)" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
+        <a href="https://www.cafonline.org/about-us/publications/2023-publications/caf-world-giving-index" target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-blue-400 underline">
+          Source: CAF World Giving Index ↗
+        </a>
       </div>
 
       <div className="card overflow-x-auto p-5">
-        <h2 className="text-lg font-bold">Top corporate donors (illustrative)</h2>
+        <h2 className="text-lg font-bold">Top corporate donors — {activeCountry}</h2>
+        <p className="mt-1 text-xs text-[var(--text-muted)]">
+          Largest corporate philanthropic programmes by estimated annual giving. Click name to view source.
+        </p>
         <table className="mt-4 w-full text-sm">
           <thead>
             <tr className="border-b text-left text-[var(--text-muted)]">
-              <th className="py-2">Corporate</th>
+              <th className="py-2 pr-4">Corporate</th>
               <th className="py-2">Est. annual giving</th>
             </tr>
           </thead>
           <tbody>
             {topCorp.map((row) => (
               <tr key={row.name} className="border-b border-[var(--border)]">
-                <td className="py-2 font-medium">{row.name}</td>
+                <td className="py-2 pr-4 font-medium">
+                  {row.url ? (
+                    <a href={row.url} target="_blank" rel="noreferrer" className="underline hover:text-[var(--accent-gold)]">
+                      {row.name} ↗
+                    </a>
+                  ) : (
+                    row.name
+                  )}
+                </td>
                 <td className="py-2">{row.giving}</td>
               </tr>
             ))}

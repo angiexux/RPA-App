@@ -319,11 +319,11 @@ export function PilotRoiTracker() {
         ) : (
           <div className="mt-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
+              <BarChart data={chartData} margin={{ bottom: 20, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="label" label={{ value: "Quarter", position: "insideBottom", offset: -12 }} />
+                <YAxis label={{ value: "Efficiency (×)", angle: -90, position: "insideLeft", offset: 10 }} />
+                <Tooltip formatter={(v) => [`${v}×`, "Efficiency"]} />
                 <Bar dataKey="efficiency" fill="var(--accent-gold)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

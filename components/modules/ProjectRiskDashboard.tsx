@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import { ModuleClaudeRefresh } from "@/components/ModuleClaudeRefresh";
+import { useAppStore } from "@/store";
 import {
   PROJECT_RISK_MOCK,
   type ProjectRiskLevel,
@@ -56,6 +57,7 @@ function toCsv(rows: ProjectRiskRow[]) {
 }
 
 export function ProjectRiskDashboard() {
+  const activeCountry = useAppStore((s) => s.activeCountry);
   const [tab, setTab] = useState<"All" | ProjectRiskLevel>("All");
   const [q, setQ] = useState("");
 
@@ -102,7 +104,7 @@ export function ProjectRiskDashboard() {
           Export CSV
         </button>
       </div>
-      <ModuleClaudeRefresh moduleKey="project_risk_dashboard" country="Portfolio" />
+      <ModuleClaudeRefresh moduleKey="project_risk_dashboard" country={activeCountry} />
 
       <div className="flex flex-wrap gap-2">
         {TABS.map((t) => (
