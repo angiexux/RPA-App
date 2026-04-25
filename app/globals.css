@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #1e2d2f;
+  --bg-secondary: #f0f4f4;
+  --bg-card: #ffffff;
+  --accent-gold: #c9922a;
+  --accent-gold-lt: #e8b84b;
+  --text-primary: #1e2d2f;
+  --text-light: #ffffff;
+  --text-muted: #6b7a7b;
+  --border: #e2e8ea;
+  --success: #4caf7d;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #4588c8;
+}
+
+@theme inline {
+  --color-background: var(--bg-secondary);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.05);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-lt));
+}
