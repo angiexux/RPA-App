@@ -216,22 +216,19 @@ export function RegulatoryRiskMonitor() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-        <div className="card space-y-3 p-5">
-        <div className="card flex flex-col justify-center p-5">
-          <p className="metric-label">Regulatory risk level</p>
-          <div className="mt-2 flex items-center gap-3">
-            <span
-              className={`inline-flex rounded-full border px-3 py-1 text-sm font-semibold ${riskPillClasses(
-                profile.riskLevel,
-              )}`}
-            >
-              {profile.riskLevel}
-            </span>
-            <span className="text-sm text-[var(--text-muted)]">
-              Derived from policy pillar ({analysis.policy.score.toFixed(1)}/5)
-            </span>
-          </div>
+      <div className="card flex flex-col justify-center p-5">
+        <p className="metric-label">Regulatory risk level</p>
+        <div className="mt-2 flex items-center gap-3">
+          <span
+            className={`inline-flex rounded-full border px-3 py-1 text-sm font-semibold ${riskPillClasses(
+              profile.riskLevel,
+            )}`}
+          >
+            {profile.riskLevel}
+          </span>
+          <span className="text-sm text-[var(--text-muted)]">
+            Derived from policy pillar ({analysis.policy.score.toFixed(1)}/5)
+          </span>
         </div>
       </div>
 
