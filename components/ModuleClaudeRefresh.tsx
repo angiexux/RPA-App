@@ -57,8 +57,8 @@ export function ModuleClaudeRefresh({
     <div className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="metric-label">Report-Ready Analysis</p>
-          <h2 className="text-lg font-bold">Latest pull highlights</h2>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-900">Report-Ready Analysis</p>
+          <h2 className="text-lg font-bold text-gray-900">Latest pull highlights</h2>
           <p className="mt-0.5 text-xs text-[var(--text-muted)]">
             {fetchedAt
               ? `Last refresh ${new Date(fetchedAt).toLocaleString()}`
