@@ -77,6 +77,8 @@ export function UsaidWithdrawal() {
         </p>
       </div>
 
+      <ModuleClaudeRefresh moduleKey="usaid_withdrawal" country={activeCountry} />
+
       <div className="card p-5">
         <p className="metric-label">Total estimated gap</p>
         <p className="mt-2 text-2xl font-bold">${totalGap}M</p>
@@ -107,8 +109,6 @@ export function UsaidWithdrawal() {
           ))}
         </div>
       </div>
-
-      <ModuleClaudeRefresh moduleKey="usaid_withdrawal" country={activeCountry} />
 
       <div className="card overflow-x-auto p-5">
         <h2 className="text-lg font-bold">Country-level detail</h2>
