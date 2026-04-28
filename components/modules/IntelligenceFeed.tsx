@@ -125,7 +125,6 @@ export function IntelligenceFeed() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
-        <div className="card space-y-3 p-5">
         <div className="card p-5">
           <p className="metric-label">Filter by tag</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -145,29 +144,29 @@ export function IntelligenceFeed() {
             ))}
           </div>
         </div>
-      </div>
 
-      {loading ? (
-        <div className="space-y-4">
-          <LoadingSkeleton />
-          <LoadingSkeleton />
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filtered.length === 0 ? (
-            <div className="card p-8 text-center text-sm text-[var(--text-muted)]">
-              No items for this tag. Try &quot;All&quot; or another theme.
-            </div>
-          ) : (
-            filtered.map((item, index) => (
-              <IntelFeedItem
-                key={`${item.title}-${item.date}-${index}`}
-                item={item}
-              />
-            ))
-          )}
-        </div>
-      )}
+        {loading ? (
+          <div className="space-y-4">
+            <LoadingSkeleton />
+            <LoadingSkeleton />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filtered.length === 0 ? (
+              <div className="card p-8 text-center text-sm text-[var(--text-muted)]">
+                No items for this tag. Try &quot;All&quot; or another theme.
+              </div>
+            ) : (
+              filtered.map((item, index) => (
+                <IntelFeedItem
+                  key={`${item.title}-${item.date}-${index}`}
+                  item={item}
+                />
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
