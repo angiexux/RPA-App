@@ -130,7 +130,7 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { action?: string; country?: string; module?: string };
+  let body: { action?: string; country?: string; module?: string; userSources?: string[] };
   try {
     body = await request.json();
   } catch {
@@ -242,11 +242,15 @@ Rules:
 - peerRadar: exactly 5 rows
 - all radar scores must be integers from 0 to 100.`;
   } else if (body.action === "module_insight") {
+    const userSourceBlock =
+      Array.isArray(body.userSources) && body.userSources.length > 0
+        ? `\nUser-provided sources to prioritize and cite (fetch and analyze these):\n${body.userSources.map((u) => `- ${u}`).join("\n")}\n`
+        : "";
     prompt = `You are a philanthropy intelligence analyst.
 
 Module: ${body.module ?? "general"}
 Country context: ${body.country ?? "global"}
-
+${userSourceBlock}
 Return ONLY valid JSON:
 {
   "highlights":[string,string,string],
@@ -255,7 +259,8 @@ Return ONLY valid JSON:
 
 Rules:
 - highlights: exactly 3 concise bullets, each 1 sentence.
-- sources: exactly 2-4 sources from this preferred catalog:
+- If user-provided sources are listed above, fetch their content and base highlights on them where relevant.
+- sources: cite user-provided sources first if used, then supplement from this preferred catalog:
 ${sourceCatalogPrompt()}
 `;
   } else {

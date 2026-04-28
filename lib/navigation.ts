@@ -53,6 +53,12 @@ export const navigation: NavSection[] = [
       { label: "Pilot ROI Tracker", href: "/pilot-roi" },
     ],
   },
+  {
+    heading: "Settings",
+    items: [
+      { label: "Source Settings", href: "/settings" },
+    ],
+  },
 ];
 
 export const routeTitles: Record<string, string> = {
@@ -73,4 +79,5 @@ export const routeTitles: Record<string, string> = {
   "social-pipeline": "Social Pipeline",
   "project-risk": "Project Risk Dashboard",
   "pilot-roi": "Pilot ROI Tracker",
+  "settings": "Source Settings",
 };

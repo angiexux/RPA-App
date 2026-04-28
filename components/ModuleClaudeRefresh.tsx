@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { useUserSources } from "@/hooks/useUserSources";
 
 type SourceItem = { name: string; url: string };
 
@@ -17,11 +18,13 @@ export function ModuleClaudeRefresh({
   const [fetchedAt, setFetchedAt] = useState<string | null>(null);
   const [highlights, setHighlights] = useState<string[]>([]);
   const [sources, setSources] = useState<SourceItem[]>([]);
+  const { getForContext } = useUserSources();
 
   const onRefresh = async () => {
     setLoading(true);
     setError(null);
     try {
+      const userSources = getForContext(country);
       const res = await fetch("/api/claude", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,6 +32,7 @@ export function ModuleClaudeRefresh({
           action: "module_insight",
           module: moduleKey,
           country,
+          userSources,
         }),
       });
       const data = (await res.json()) as {
