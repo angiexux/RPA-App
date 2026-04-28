@@ -101,10 +101,10 @@ export function ExpansionScreener() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-slate-100 mb-2">
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">
           Expansion Screener — Continent Comparison
         </h1>
-        <p className="mt-2 max-w-3xl text-sm text-slate-400">
+        <p className="mt-2 max-w-3xl text-sm text-slate-600">
           Explore all countries by continent, compare composite scores across markets, and
           dive deeper into specific countries to understand their readiness for philanthropic
           expansion.

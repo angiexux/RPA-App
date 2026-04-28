@@ -102,30 +102,13 @@ export function CapitalFlowTracker() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Capital Flow Tracker</h1>
-          <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
-            Inflows by funder type (illustrative 5-year stack). Brazil reference:
-            Ford Foundation ~$69.6M (2020–2024) shown in top funders table.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          {loading ? "Refreshing..." : "Refresh (Claude)"}
-        </button>
+      <div>
+        <h1 className="text-3xl font-bold">Capital Flow Tracker</h1>
+        <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
+          Inflows by funder type (illustrative 5-year stack). Brazil reference:
+          Ford Foundation ~$69.6M (2020–2024) shown in top funders table.
+        </p>
       </div>
-
-      {feedError ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-          {feedError}
-        </div>
-      ) : null}
 
       {liveData && liveForCountry === activeCountry && liveData.sources.length > 0 ? (
         <div className="card p-4 text-sm">
@@ -141,15 +124,32 @@ export function CapitalFlowTracker() {
         </div>
       ) : null}
 
-      <div className="card max-w-md p-5">
-        <p className="text-xs text-[var(--text-muted)]">
-          Last refreshed {new Date(lastRefresh).toLocaleString()}
-          {liveData && liveForCountry === activeCountry ? (
-            <span className="ml-2 font-semibold text-[var(--accent-gold)]">
-              · Claude
-            </span>
-          ) : null}
-        </p>
+      <div className="card p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-900">Report-Ready Analysis</p>
+            <h2 className="text-lg font-bold text-gray-900">Latest pull highlights</h2>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+              {liveData && liveForCountry === activeCountry
+                ? `Last refresh ${new Date(lastRefresh).toLocaleString()} · Claude`
+                : "Click Refresh to pull live capital flow data from Claude."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Refreshing..." : "Refresh (Claude)"}
+          </button>
+        </div>
+        {feedError && (
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
+            {feedError}
+          </div>
+        )}
       </div>
 
       <div className="card p-5">

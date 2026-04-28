@@ -78,58 +78,54 @@ export function IntelligenceFeed() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Intelligence Feed</h1>
-          <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
-            Per-country intelligence. <strong>Refresh</strong> calls{" "}
-            <strong>Anthropic Claude</strong> on the server (requires{" "}
-            <code className="rounded bg-slate-100 px-1">ANTHROPIC_API_KEY</code>
-            ). Falls back to seeded data if the request fails.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {liveItems && liveForCountry === activeCountry ? (
-            <button
-              type="button"
-              onClick={() => {
-                setLiveItems(null);
-                setLiveForCountry(null);
-              }}
-              className="rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold"
-            >
-              Use seeded data
-            </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            {loading ? "Refreshing..." : "Refresh (Claude)"}
-          </button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold">Intelligence Feed</h1>
+        <p className="mt-2 max-w-3xl text-sm text-[var(--text-muted)]">
+          Per-country intelligence for {activeCountry}. Refresh calls Claude on the server; falls back to seeded data if the request fails.
+        </p>
       </div>
 
-      {feedError && feedError.country === activeCountry ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-          {feedError.message}
+      <div className="card p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-900">Report-Ready Analysis</p>
+            <h2 className="text-lg font-bold text-gray-900">Latest pull highlights</h2>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+              {liveItems && liveForCountry === activeCountry
+                ? `Last fetch ${new Date(fetchedAt).toLocaleString()} · Claude`
+                : `Last fetch ${new Date(fetchedAt).toLocaleString()} · Seeded data`}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {liveItems && liveForCountry === activeCountry && (
+              <button
+                type="button"
+                onClick={() => { setLiveItems(null); setLiveForCountry(null); }}
+                className="rounded-xl border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold"
+              >
+                Use seeded data
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              {loading ? "Refreshing..." : "Refresh (Claude)"}
+            </button>
+          </div>
         </div>
-      ) : null}
+        {feedError && feedError.country === activeCountry && (
+          <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
+            {feedError.message}
+          </div>
+        )}
+      </div>
 
       <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
         <div className="card space-y-3 p-5">
-          <p className="text-xs text-[var(--text-muted)]">
-            Last fetch {new Date(fetchedAt).toLocaleString()}
-            {liveItems && liveForCountry === activeCountry ? (
-              <span className="ml-2 font-semibold text-[var(--accent-gold)]">
-                · Claude
-              </span>
-            ) : null}
-          </p>
-        </div>
         <div className="card p-5">
           <p className="metric-label">Filter by tag</p>
           <div className="mt-3 flex flex-wrap gap-2">
