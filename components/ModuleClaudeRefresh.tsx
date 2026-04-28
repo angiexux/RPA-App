@@ -50,14 +50,15 @@ export function ModuleClaudeRefresh({
   };
 
   return (
-    <div className="card p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="card p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold">Live Claude pull</p>
-          <p className="text-xs text-[var(--text-muted)]">
+          <p className="metric-label">Report-Ready Analysis</p>
+          <h2 className="text-lg font-bold">Latest pull highlights</h2>
+          <p className="mt-0.5 text-xs text-[var(--text-muted)]">
             {fetchedAt
               ? `Last refresh ${new Date(fetchedAt).toLocaleString()}`
-              : "No live pull yet"}
+              : "Click Refresh to pull live context from Claude."}
           </p>
         </div>
         <button
@@ -70,19 +71,22 @@ export function ModuleClaudeRefresh({
           {loading ? "Refreshing..." : "Refresh (Claude)"}
         </button>
       </div>
-      {error ? (
+
+      {error && (
         <div className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
           {error}
         </div>
-      ) : null}
-      {highlights.length > 0 ? (
-        <ul className="mt-3 list-disc space-y-1 pl-4 text-sm text-[var(--text-muted)]">
+      )}
+
+      {highlights.length > 0 && (
+        <ul className="mt-4 list-disc space-y-1 pl-4 text-sm text-[var(--text-muted)]">
           {highlights.map((item, index) => (
             <li key={`${item}-${index}`}>{item}</li>
           ))}
         </ul>
-      ) : null}
-      {sources.length > 0 ? (
+      )}
+
+      {sources.length > 0 && (
         <p className="mt-3 text-xs text-[var(--text-muted)]">
           <span className="font-semibold">Sources: </span>
           {sources.map((s, i) => (
@@ -94,7 +98,7 @@ export function ModuleClaudeRefresh({
             </span>
           ))}
         </p>
-      ) : null}
+      )}
     </div>
   );
 }

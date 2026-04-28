@@ -146,16 +146,9 @@ export default function CountryInfoPopup({
             </div>
           </div>
 
-          {/* View More Button */}
-          <button
-            onClick={() => {
-              onCountrySelect(country);
-              onClose();
-            }}
-            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-          >
-            View Full Details
-          </button>
+          <p className="text-center text-sm text-slate-400 italic">
+            Click on each score to learn more
+          </p>
         </div>
       </div>
 
