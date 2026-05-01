@@ -6,6 +6,7 @@ export const navigation: NavSection[] = [
     items: [
       { label: "Expansion Screener", href: "/expansion-screener" },
       { label: "Feasibility Scorecard", href: "/feasibility-scorecard" },
+      { label: "Scoring Framework", href: "/scoring-framework" },
       { label: "Model Matrix", href: "/model-matrix" },
     ],
   },
@@ -64,6 +65,7 @@ export const navigation: NavSection[] = [
 export const routeTitles: Record<string, string> = {
   "expansion-screener": "Expansion Screener",
   "feasibility-scorecard": "Feasibility Scorecard",
+  "scoring-framework": "Scoring Framework",
   "model-matrix": "Model Matrix",
   "regulatory-risk": "Regulatory Risk Monitor",
   "intelligence-feed": "Intelligence Feed",

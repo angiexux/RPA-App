@@ -16,6 +16,7 @@ import { ProjectRiskDashboard } from "@/components/modules/ProjectRiskDashboard"
 import { RegulatoryRiskMonitor } from "@/components/modules/RegulatoryRiskMonitor";
 import { SocialPipeline } from "@/components/modules/SocialPipeline";
 import { UsaidWithdrawal } from "@/components/modules/UsaidWithdrawal";
+import { ScoringFramework } from "@/components/modules/ScoringFramework";
 
 export default async function ModulePage({
   params,
@@ -60,6 +61,8 @@ export default async function ModulePage({
       return <ProjectRiskDashboard />;
     case "pilot-roi":
       return <PilotRoiTracker />;
+    case "scoring-framework":
+      return <ScoringFramework />;
     default:
       notFound();
   }
