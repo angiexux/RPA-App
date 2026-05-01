@@ -12,7 +12,7 @@ import { useAppStore } from "@/store";
 const pillarMeta = [
   { key: "policy",         label: "Policy",         weight: "25%", route: "/regulatory-risk" },
   { key: "capital",        label: "Capital",         weight: "30%", route: "/capital-flow" },
-  { key: "infrastructure", label: "Infrastructure",  weight: "25%", route: "/daf-monitor" },
+  { key: "infrastructure", label: "Financial & Technical Infrastructure", weight: "25%", route: "/daf-monitor" },
   { key: "talent",         label: "Talent",          weight: "20%", route: "/major-funder-tracker" },
 ] as const;
 

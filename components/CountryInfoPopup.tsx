@@ -64,7 +64,7 @@ export default function CountryInfoPopup({
   const pillars = [
     { name: 'Policy', score: policyScore, key: 'policy' },
     { name: 'Capital', score: capitalScore, key: 'capital' },
-    { name: 'Infrastructure', score: infrastructureScore, key: 'infrastructure' },
+    { name: 'Financial & Technical Infrastructure', score: infrastructureScore, key: 'infrastructure' },
     { name: 'Talent', score: talentScore, key: 'talent' },
   ];
 

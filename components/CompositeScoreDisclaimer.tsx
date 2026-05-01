@@ -105,10 +105,10 @@ const CompositeScoreDisclaimer = () => {
                 </span>
                 <div>
                   <p className="text-slate-200 font-medium">
-                    Infrastructure Readiness
+                    Financial &amp; Technical Infrastructure Readiness
                   </p>
                   <p className="text-slate-400 text-sm">
-                    Institutional and technological infrastructure capabilities
+                    Financial systems, institutional capacity, and technological infrastructure capabilities
                   </p>
                 </div>
               </div>

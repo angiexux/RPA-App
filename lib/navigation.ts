@@ -27,7 +27,7 @@ export const navigation: NavSection[] = [
     ],
   },
   {
-    heading: "Infrastructure",
+    heading: "Financial & Technical Infrastructure",
     items: [
       { label: "DAF Cross-Border Monitor", href: "/daf-monitor" },
       { label: "Philanthropy Index", href: "/philanthropy-index" },
