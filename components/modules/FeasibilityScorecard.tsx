@@ -146,6 +146,25 @@ export function FeasibilityScorecard() {
                 </p>
               </div>
             </div>
+
+            {/* AI Limitations Disclaimer */}
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900 space-y-2">
+              <p className="font-semibold text-sm">About This Score</p>
+              <p className="text-[var(--text-muted)] text-xs">
+                The composite score is generated using AI-assisted analysis of public data, policy documents, and secondary research.
+                While we apply a standardised 15-indicator framework, the following limitations apply:
+              </p>
+              <ul className="list-disc pl-4 space-y-1 text-xs text-amber-800">
+                <li><strong>Data recency:</strong> Scores reflect the latest available data at time of analysis; regulatory changes or donor shocks may not be immediately captured.</li>
+                <li><strong>Source bias:</strong> Reliance on publicly available English-language sources may underweight local-language or unpublished intelligence.</li>
+                <li><strong>Qualitative gaps:</strong> Stakeholder interview insights are incorporated where available, but not all countries have equal interview coverage.</li>
+                <li><strong>Model uncertainty:</strong> The 1–5 scoring scale involves judgment calls; scores should be treated as directional guidance, not precise rankings.</li>
+                <li><strong>No legal advice:</strong> Policy and tax interpretations are research-based; RPA should verify with local counsel before operational decisions.</li>
+              </ul>
+              <p className="text-xs text-amber-800 font-medium pt-1">
+                We recommend using this score as a triage tool for initial market comparison, then conducting deeper due diligence before committing capital.
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
