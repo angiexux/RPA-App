@@ -2,7 +2,7 @@ import { NavSection } from "@/lib/types";
 
 export const navigation: NavSection[] = [
   {
-    heading: "Core Market Intelligence",
+    heading: "Country Readiness Dashboard",
     items: [
       { label: "Expansion Screener", href: "/expansion-screener" },
       { label: "Feasibility Scorecard", href: "/feasibility-scorecard" },

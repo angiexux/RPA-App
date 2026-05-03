@@ -19,6 +19,7 @@ import {
   CAPITAL_FUNDERS,
   CAPITAL_SECTORS,
   CAPITAL_STACKED,
+  type CapitalFunderRow,
 } from "@/lib/moduleSeedData";
 import { useAppStore } from "@/store";
 
@@ -38,12 +39,7 @@ type CapitalFlowData = {
     corporate: number;
     domestic: number;
   }>;
-  funders: Array<{
-    name: string;
-    total: string;
-    sector: string;
-    trend: string;
-  }>;
+  funders: CapitalFunderRow[];
   sectors: Array<{ name: string; value: number }>;
   sources: Array<{ name: string; url: string }>;
 };

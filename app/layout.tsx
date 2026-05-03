@@ -12,7 +12,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RPA Global South Intelligence OS",
-  description: "Market intelligence dashboard for fiscal intermediary expansion analysis.",
+  description:
+    "Country readiness dashboard for fiscal intermediary expansion analysis.",
 };
 
 export default function RootLayout({

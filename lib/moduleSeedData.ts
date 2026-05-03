@@ -76,7 +76,15 @@ export const CAPITAL_STACKED = [
   { year: "2025", bilateral: 7, foundation: 32, corporate: 13, domestic: 22 },
 ];
 
-export const CAPITAL_FUNDERS = [
+export type CapitalFunderRow = {
+  name: string;
+  total: string;
+  sector: string;
+  trend: string;
+  sourceUrl?: string;
+};
+
+export const CAPITAL_FUNDERS: CapitalFunderRow[] = [
   {
     name: "Ford Foundation",
     total: "$69.6M",
