@@ -1,0 +1,404 @@
+// Run with: node generate-guide.mjs
+// Generates RPA_Platform_User_Guide.html — open in Chrome and Ctrl+P → Save as PDF
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RPA Platform User Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', Arial, sans-serif; font-size: 11pt; color: #1a1a1a; background: #fff; }
+
+  /* ── COVER ── */
+  .cover {
+    page-break-after: always;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px 72px;
+    background: linear-gradient(145deg, #0f1e22 0%, #1e3a40 60%, #c9922a 100%);
+    color: #fff;
+  }
+  .cover-eyebrow { font-size: 10pt; letter-spacing: .15em; text-transform: uppercase; color: #c9922a; margin-bottom: 20px; }
+  .cover-title { font-size: 34pt; font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
+  .cover-subtitle { font-size: 15pt; font-weight: 400; color: #d4d4d4; margin-bottom: 40px; }
+  .cover-meta { font-size: 10pt; color: #a0a0a0; border-top: 1px solid rgba(255,255,255,.2); padding-top: 20px; width: 100%; }
+  .cover-confidential { display: inline-block; margin-top: 10px; background: #c9922a; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 9pt; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+
+  /* ── TOC ── */
+  .toc { page-break-after: always; padding: 60px 72px; }
+  .toc h2 { font-size: 20pt; font-weight: 700; margin-bottom: 32px; padding-bottom: 12px; border-bottom: 3px solid #c9922a; }
+  .toc-item { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; border-bottom: 1px dotted #d4d4d4; font-size: 11pt; }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-num { color: #c9922a; font-weight: 700; min-width: 30px; }
+  .toc-title { flex: 1; padding: 0 12px; }
+  .toc-page { color: #888; font-size: 10pt; }
+
+  /* ── SECTIONS ── */
+  .section { padding: 56px 72px; page-break-before: always; }
+  .section:first-of-type { page-break-before: auto; }
+  .section-num { font-size: 9pt; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: #c9922a; margin-bottom: 6px; }
+  h1.section-title { font-size: 22pt; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+  h2.subsection { font-size: 13pt; font-weight: 700; margin: 28px 0 12px; color: #0f1e22; }
+  p { line-height: 1.7; margin-bottom: 12px; }
+  ul, ol { margin: 10px 0 14px 20px; }
+  li { line-height: 1.7; margin-bottom: 4px; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 10pt; }
+  thead tr { background: #0f1e22; color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-weight: 600; }
+  tbody tr:nth-child(even) { background: #f8f9fa; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #e5e7eb; vertical-align: top; line-height: 1.5; }
+
+  /* ── CODE ── */
+  pre, code { font-family: 'Courier New', Courier, monospace; }
+  pre { background: #f0f4f5; border: 1px solid #d4dde0; border-left: 4px solid #c9922a; border-radius: 4px; padding: 14px 18px; margin: 14px 0 20px; font-size: 9pt; line-height: 1.65; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  code { background: #f0f4f5; padding: 1px 5px; border-radius: 3px; font-size: 9.5pt; }
+
+  /* ── CALLOUTS ── */
+  .warning { background: #fff8e1; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 12px 16px; margin: 16px 0; font-size: 10pt; }
+  .warning strong { color: #b45309; }
+  .tip { background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px; padding: 12px 16px; margin: 16px 0; font-size: 10pt; }
+  .step { display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start; }
+  .step-num { background: #0f1e22; color: #c9922a; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10pt; flex-shrink: 0; margin-top: 2px; }
+  .step-content { flex: 1; }
+
+  /* ── FOOTER (print) ── */
+  @media print {
+    @page { size: A4; margin: 0; }
+    .cover { height: 100vh; }
+    .section, .toc { padding: 48px 64px 64px; }
+    footer { display: block !important; }
+  }
+  footer { display: none; position: fixed; bottom: 16px; left: 72px; right: 72px; font-size: 8pt; color: #aaa; border-top: 1px solid #e5e7eb; padding-top: 6px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="cover-eyebrow">RPA Intelligence Platform</div>
+  <div class="cover-title">RPA Global South<br>Intelligence OS</div>
+  <div class="cover-subtitle">Backend User Guide<br>How to Update &amp; Maintain the Platform</div>
+  <div class="cover-meta">
+    Version 1.0 &nbsp;|&nbsp; April 2026 &nbsp;|&nbsp; Internal Use Only
+    <br><span class="cover-confidential">Confidential</span>
+  </div>
+</div>
+
+<!-- ═══ TABLE OF CONTENTS ═══ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <div class="toc-item"><span class="toc-num">1</span><span class="toc-title">Platform Architecture Overview</span><span class="toc-page">3</span></div>
+  <div class="toc-item"><span class="toc-num">2</span><span class="toc-title">Environment Variables &amp; API Keys</span><span class="toc-page">4</span></div>
+  <div class="toc-item"><span class="toc-num">3</span><span class="toc-title">How to Add a New Country</span><span class="toc-page">5</span></div>
+  <div class="toc-item"><span class="toc-num">4</span><span class="toc-title">How to Update Scoring Data</span><span class="toc-page">6</span></div>
+  <div class="toc-item"><span class="toc-num">5</span><span class="toc-title">How to Modify Indicator Weights</span><span class="toc-page">7</span></div>
+  <div class="toc-item"><span class="toc-num">6</span><span class="toc-title">How to Update the Model Matrix</span><span class="toc-page">8</span></div>
+  <div class="toc-item"><span class="toc-num">7</span><span class="toc-title">Troubleshooting Common Issues</span><span class="toc-page">9</span></div>
+  <div class="toc-item"><span class="toc-num">8</span><span class="toc-title">Quick Reference Card</span><span class="toc-page">10</span></div>
+</div>
+
+<!-- ═══ SECTION 1 ═══ -->
+<div class="section">
+  <div class="section-num">Section 1</div>
+  <h1 class="section-title">Platform Architecture Overview</h1>
+
+  <h2 class="subsection">Tech Stack</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td>Next.js 16.2.4 (App Router) with React 19</td></tr>
+      <tr><td>Language</td><td>TypeScript</td></tr>
+      <tr><td>Styling</td><td>Tailwind CSS v4</td></tr>
+      <tr><td>Charts</td><td>Recharts</td></tr>
+      <tr><td>State Management</td><td>Zustand</td></tr>
+      <tr><td>AI Integration</td><td>Anthropic Claude API (claude-sonnet-4-5)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning"><strong>Important:</strong> There is no separate Python backend. All data lives in TypeScript files under <code>lib/</code>, and AI calls go through a Next.js API route at <code>app/api/claude/route.ts</code>.</div>
+
+  <h2 class="subsection">Key Files &amp; Directories</h2>
+  <table>
+    <thead><tr><th>File Path</th><th>Purpose</th><th>Edit Frequency</th></tr></thead>
+    <tbody>
+      <tr><td><code>lib/mockData.ts</code></td><td>Country profiles, pillar scores, model recommendations</td><td>When adding/updating countries</td></tr>
+      <tr><td><code>lib/scoring.ts</code></td><td>Composite score formula and model recommendation logic</td><td>When changing weights</td></tr>
+      <tr><td><code>lib/moduleSeedData.ts</code></td><td>CSO metrics, capital flows, seed data per country</td><td>When updating operational data</td></tr>
+      <tr><td><code>lib/regulatoryData.ts</code></td><td>Regulatory risk profiles per country</td><td>When policy changes</td></tr>
+      <tr><td><code>app/api/claude/route.ts</code></td><td>Server-side Claude API integration</td><td>When changing AI prompts</td></tr>
+      <tr><td><code>.env.local</code></td><td>API keys — never commit to Git</td><td>When rotating credentials</td></tr>
+      <tr><td><code>components/modules/</code></td><td>One <code>.tsx</code> file per page/module</td><td>When editing UI</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subsection">The Four Pillars</h2>
+  <table>
+    <thead><tr><th>Pillar</th><th>Weight</th><th>Description</th><th>Deep-dive Page</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Policy</strong></td><td>25%</td><td>Regulatory environment, NGO law, tax incentives</td><td>/regulatory-risk</td></tr>
+      <tr><td><strong>Capital Flows</strong></td><td>30%</td><td>International &amp; domestic funding availability</td><td>/capital-flow</td></tr>
+      <tr><td><strong>Infrastructure</strong></td><td>25%</td><td>Fiscal sponsors, intermediaries, re-grantors</td><td>/daf-monitor</td></tr>
+      <tr><td><strong>Talent</strong></td><td>20%</td><td>Local staffing capacity, sector expertise</td><td>/major-funder-tracker</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subsection">Composite Score Formula</h2>
+  <pre>composite = (policy × 0.25) + (capital × 0.30) + (infrastructure × 0.25) + (talent × 0.20)</pre>
+
+  <h2 class="subsection">Model Recommendations (auto-generated)</h2>
+  <table>
+    <thead><tr><th>Score Range</th><th>Recommended Model</th><th>Indicator Colour</th></tr></thead>
+    <tbody>
+      <tr><td>≥ 4.0</td><td>Local Partner</td><td>Green</td></tr>
+      <tr><td>3.0 – 3.99</td><td>Hybrid</td><td>Amber</td></tr>
+      <tr><td>2.0 – 2.99</td><td>New Build</td><td>Orange</td></tr>
+      <tr><td>&lt; 2.0</td><td>Premature</td><td>Red</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ SECTION 2 ═══ -->
+<div class="section">
+  <div class="section-num">Section 2</div>
+  <h1 class="section-title">Environment Variables &amp; API Keys</h1>
+
+  <p><strong>Location:</strong> <code>rpa-intel-os/.env.local</code> — this file is excluded from Git via <code>.gitignore</code>. Never commit it.</p>
+
+  <h2 class="subsection">Required Variables</h2>
+  <pre>ANTHROPIC_API_KEY=sk-ant-api03-...      # Your Anthropic API key
+ANTHROPIC_MODEL=claude-sonnet-4-5       # Model version</pre>
+
+  <h2 class="subsection">How to Rotate the API Key</h2>
+  <div class="step"><div class="step-num">1</div><div class="step-content">Go to <code>https://console.anthropic.com</code> → API Keys → Create new key</div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-content">Open <code>.env.local</code> in any text editor (Notepad works) and replace the value of <code>ANTHROPIC_API_KEY</code></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-content">Restart the dev server: press <strong>Ctrl+C</strong> in your terminal, then run <code>npm run dev</code> again</div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-content">Verify: click <strong>Refresh (Claude)</strong> on any module page. If highlights appear, the key is working.</div></div>
+
+  <div class="warning"><strong>Security rules:</strong> Never paste API keys into GitHub issues, Slack messages, or shared documents. Rotate keys every 90 days. The <code>.env.local</code> file must never be committed to Git.</div>
+</div>
+
+<!-- ═══ SECTION 3 ═══ -->
+<div class="section">
+  <div class="section-num">Section 3</div>
+  <h1 class="section-title">How to Add a New Country</h1>
+
+  <p>All country data lives in: <code>lib/mockData.ts</code></p>
+
+  <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Add the country entry</strong> to the <code>allCountryAnalyses</code> array in <code>lib/mockData.ts</code>:</div></div>
+<pre>{
+  country: "Morocco",
+  continent: "Sub-Saharan Africa",  // or "Latin America" — must match exactly
+  policy: {
+    score: 3.2,
+    justification: "Describe the policy environment in 1–2 sentences..."
+  },
+  capital: {
+    score: 3.8,
+    justification: "Describe capital flow maturity..."
+  },
+  infrastructure: {
+    score: 3.0,
+    justification: "Describe the intermediary ecosystem..."
+  },
+  talent: {
+    score: 3.5,
+    justification: "Describe local talent availability..."
+  },
+  fetchedAt: "2026-04-30T00:00:00Z",
+}</pre>
+
+  <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Add the flag emoji</strong> to the <code>FLAG_MAP</code> constant in <code>components/modules/ExpansionScreener.tsx</code>:<br><code>Morocco: '🇲🇦',</code></div></div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Add CSO metrics</strong> to <code>lib/moduleSeedData.ts</code> (optional — the platform uses sensible defaults if omitted).</div></div>
+
+  <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Add a regulatory profile</strong> to <code>lib/regulatoryData.ts</code> following the existing country pattern.</div></div>
+
+  <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Test:</strong> Run <code>npm run dev</code>, navigate to Expansion Screener, and confirm the new country card appears. Click through to Feasibility Scorecard to confirm all four pillars populate.</div></div>
+
+  <div class="warning"><strong>Continent values must match exactly:</strong> Only <code>"Sub-Saharan Africa"</code> and <code>"Latin America"</code> are currently supported as continent groupings. Any other value will cause the country to be invisible in the Expansion Screener map.</div>
+
+  <div class="tip"><strong>Tip:</strong> The composite score and model recommendation are computed automatically from the four pillar scores — you do not need to calculate or hardcode them.</div>
+</div>
+
+<!-- ═══ SECTION 4 ═══ -->
+<div class="section">
+  <div class="section-num">Section 4</div>
+  <h1 class="section-title">How to Update Scoring Data</h1>
+
+  <p><strong>Scenario:</strong> A policy change has occurred (e.g., new NGO law enacted in Brazil)</p>
+
+  <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Open <code>lib/mockData.ts</code></strong> and find the relevant country entry. Update the pillar score and justification:</div></div>
+<pre>policy: {
+  score: 3.8,   // was 3.5 — updated after CL 227/2026 partial state adoption
+  justification: "9 of 26 states now exempt CSO donations under CL 227/2026 (Apr 2026). Federal framework unchanged."
+},</pre>
+
+  <div class="step"><div class="step-num">2</div><div class="step-content"><strong>The composite score recalculates automatically.</strong> No script is needed — <code>lib/scoring.ts</code> recomputes it in real time on every page load.</div></div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Update the <code>fetchedAt</code> timestamp</strong> so users can see when the data was last reviewed:</div></div>
+  <pre>fetchedAt: "2026-04-30T00:00:00Z"</pre>
+
+  <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Save the file.</strong> In dev mode, Next.js hot-reloads automatically. For production:</div></div>
+<pre>npm run build
+npm run start</pre>
+</div>
+
+<!-- ═══ SECTION 5 ═══ -->
+<div class="section">
+  <div class="section-num">Section 5</div>
+  <h1 class="section-title">How to Modify Indicator Weights</h1>
+
+  <div class="warning"><strong>Warning:</strong> Changing weights alters composite scores for all 21 countries simultaneously. Always document the change with a rationale and date.</div>
+
+  <p><strong>Location:</strong> <code>lib/scoring.ts</code></p>
+
+  <h2 class="subsection">Current Weights</h2>
+<pre>export function computeComposite(
+  policy: number,
+  capital: number,
+  infrastructure: number,
+  talent: number
+): number {
+  return (policy * 0.25) + (capital * 0.30) + (infrastructure * 0.25) + (talent * 0.20);
+}</pre>
+
+  <h2 class="subsection">Example — Increasing Capital Weight Post-USAID Withdrawal</h2>
+<pre>export function computeComposite(
+  policy: number,
+  capital: number,
+  infrastructure: number,
+  talent: number
+): number {
+  // v1.1 — 2026-04-30: Increased capital weight from 0.30 to 0.35
+  // Rationale: USAID withdrawal makes donor diversity the highest-priority variable
+  return (policy * 0.20) + (capital * 0.35) + (infrastructure * 0.25) + (talent * 0.20);
+}</pre>
+
+  <h2 class="subsection">Rules</h2>
+  <ul>
+    <li>Weights must sum to exactly <strong>1.00</strong></li>
+    <li>Update the weight labels shown on pillar cards in <code>components/modules/FeasibilityScorecard.tsx</code> (search for <code>"25% weight"</code> etc.)</li>
+    <li>Add a changelog comment in the code explaining the rationale</li>
+    <li>Rebuild for production: <code>npm run build</code></li>
+  </ul>
+</div>
+
+<!-- ═══ SECTION 6 ═══ -->
+<div class="section">
+  <div class="section-num">Section 6</div>
+  <h1 class="section-title">How to Update the Model Matrix</h1>
+
+  <p><strong>Location:</strong> <code>components/modules/ModelMatrix.tsx</code> — find the <code>STATIC</code> constant near the top of the file.</p>
+
+  <p>The three expansion models (<strong>New Build</strong>, <strong>Hybrid</strong>, <strong>Local Partner</strong>) are each defined with these fields:</p>
+
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>cost</code></td><td>string</td><td>Estimated setup cost range (e.g. "$800K–$2.5M")</td></tr>
+      <tr><td><code>timeline</code></td><td>string</td><td>Months to operational readiness</td></tr>
+      <tr><td><code>keyRisks</code></td><td>string</td><td>Primary regulatory and operational risks</td></tr>
+      <tr><td><code>rpaIntensity</code></td><td>string</td><td>RPA oversight level required</td></tr>
+      <tr><td><code>bestFit</code></td><td>string</td><td>Ideal country profile for this model</td></tr>
+      <tr><td><code>precedent</code></td><td>string</td><td>Example organisations that have used this model</td></tr>
+      <tr><td><code>riskLevel</code></td><td>number (0–5)</td><td>Execution risk score — drives the risk meter bar</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subsection">Example — Updating New Build Cost Range</h2>
+<pre>"New Build": {
+  cost: "$3.0M–$7.5M+ (legal entity, licenses, systems, launch team)",  // updated
+  riskLevel: 4.5,  // increased after observed market entry costs
+  // ... all other fields remain unchanged
+},</pre>
+
+  <p>To add a <strong>fourth model</strong>, add a new entry to both the <code>MODELS</code> array (line ~7) and the <code>STATIC</code> object, following the same structure as the existing three.</p>
+</div>
+
+<!-- ═══ SECTION 7 ═══ -->
+<div class="section">
+  <div class="section-num">Section 7</div>
+  <h1 class="section-title">Troubleshooting Common Issues</h1>
+
+  <table>
+    <thead><tr><th>Issue</th><th>Likely Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Score shows 0 or NaN</td><td>Missing or null pillar score in <code>mockData.ts</code></td><td>Check all 4 pillar scores are numbers, not <code>undefined</code></td></tr>
+      <tr><td>New country not in Expansion Screener</td><td>Wrong continent string</td><td>Must exactly match <code>"Sub-Saharan Africa"</code> or <code>"Latin America"</code></td></tr>
+      <tr><td>Refresh (Claude) returns error</td><td>Invalid or expired <code>ANTHROPIC_API_KEY</code></td><td>Rotate key in <code>.env.local</code>, restart server</td></tr>
+      <tr><td>Refresh (Claude) returns "Incomplete response"</td><td>Claude returned partial JSON</td><td>Edit the prompt for that action in <code>app/api/claude/route.ts</code> — add stricter JSON format instructions</td></tr>
+      <tr><td>Map iframe blank for new country</td><td><code>getCountryMapEmbed()</code> missing entry</td><td>Add country to <code>lib/countryGeo.ts</code></td></tr>
+      <tr><td>App won't start — port in use</td><td>Another Next.js process already running</td><td>Run: <code>taskkill /F /IM node.exe</code> (Windows) then retry</td></tr>
+      <tr><td>Build fails — TypeScript error</td><td>Incorrect type in new country entry</td><td>Ensure <code>continent</code> matches the union type and all scores are <code>number</code></td></tr>
+      <tr><td>Report-Ready Analysis card missing on a page</td><td><code>ModuleClaudeRefresh</code> not placed correctly</td><td>Add <code>&lt;ModuleClaudeRefresh moduleKey="..." country={activeCountry} /&gt;</code> immediately after the description <code>&lt;div&gt;</code></td></tr>
+      <tr><td>PowerShell blocks <code>npm run dev</code></td><td>Execution policy restriction</td><td>Use <strong>Command Prompt (cmd)</strong> instead of PowerShell</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subsection">Still Stuck?</h2>
+  <ul>
+    <li>Check <code>.next/dev/logs/next-development.log</code> for detailed Next.js error traces</li>
+    <li>Run <code>npm run build</code> for a full TypeScript compile check — it shows all errors with line numbers</li>
+    <li>Hard refresh the browser: <strong>Ctrl+Shift+R</strong> (clears Next.js client cache)</li>
+  </ul>
+</div>
+
+<!-- ═══ SECTION 8 ═══ -->
+<div class="section">
+  <div class="section-num">Section 8</div>
+  <h1 class="section-title">Quick Reference Card</h1>
+
+  <table>
+    <thead><tr><th>Task</th><th>File to Edit</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Rotate API key</td><td><code>.env.local</code></td><td>Restart dev server after change</td></tr>
+      <tr><td>Add a country</td><td><code>lib/mockData.ts</code></td><td>Also add flag to <code>ExpansionScreener.tsx</code></td></tr>
+      <tr><td>Update a pillar score</td><td><code>lib/mockData.ts</code></td><td>Composite recalculates automatically</td></tr>
+      <tr><td>Change pillar weights</td><td><code>lib/scoring.ts</code></td><td>Must sum to 1.00; update UI labels too</td></tr>
+      <tr><td>Update model matrix text</td><td><code>components/modules/ModelMatrix.tsx</code></td><td>Edit the <code>STATIC</code> constant</td></tr>
+      <tr><td>Update regulatory profile</td><td><code>lib/regulatoryData.ts</code></td><td>Follow existing profile structure</td></tr>
+      <tr><td>Update CSO / capital seed data</td><td><code>lib/moduleSeedData.ts</code></td><td>Per-country override or default fallback</td></tr>
+      <tr><td>Change Claude AI prompt</td><td><code>app/api/claude/route.ts</code></td><td>Find the <code>action</code> case and edit the prompt string</td></tr>
+      <tr><td>Rebuild for production</td><td>Terminal</td><td><code>npm run build</code> then <code>npm run start</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="subsection">Running the App Locally</h2>
+  <div class="warning"><strong>Use Command Prompt (cmd), not PowerShell</strong> — PowerShell has execution policy restrictions that block npm on this machine.</div>
+<pre>cd "D:\\Раб стол\\学习\\2026春\\1. DUMP\\RPA spec new\\rpa-intel-os"
+npm run dev</pre>
+  <p>Then open: <strong>http://localhost:3000</strong> (or the port shown in the terminal output)</p>
+
+  <br><br>
+  <div style="border-top:2px solid #e5e7eb; padding-top:20px; color:#888; font-size:9pt; text-align:center;">
+    RPA Global South Intelligence OS &nbsp;—&nbsp; Confidential &nbsp;|&nbsp; v1.0 &nbsp;|&nbsp; April 2026
+  </div>
+</div>
+
+</body>
+</html>`;
+
+const outPath = path.join(__dirname, 'RPA_Platform_User_Guide.html');
+fs.writeFileSync(outPath, html, 'utf8');
+console.log('✓ Guide written to:', outPath);
+console.log('');
+console.log('To save as PDF:');
+console.log('  1. Open the file in Chrome');
+console.log('  2. Press Ctrl+P');
+console.log('  3. Set Destination → Save as PDF');
+console.log('  4. Set Paper size: A4, Margins: None');
+console.log('  5. Click Save');

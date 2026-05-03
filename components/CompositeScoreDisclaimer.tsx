@@ -3,6 +3,34 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
+/** Aligned with Feasibility & Impact Scoring Framework (ScoringFramework / computeComposite). */
+const PILLAR_BREAKDOWN = [
+  {
+    weight: '25%',
+    title: 'Policy Environment',
+    description:
+      'Ease of nonprofit registration, foreign funding restrictions, tax incentives, compliance burden',
+  },
+  {
+    weight: '30%',
+    title: 'Capital Flow Maturity',
+    description:
+      'Volume of international giving, diversity of sources, intermediary adoption, cross-border mechanisms',
+  },
+  {
+    weight: '25%',
+    title: 'Financial & Technical Infrastructure',
+    description:
+      'Existing fiscal sponsors, re-granting capacity, back-office providers, legal expertise',
+  },
+  {
+    weight: '20%',
+    title: 'Talent & Ecosystem',
+    description:
+      'Availability of professionals, philanthropic associations, knowledge infrastructure, governance',
+  },
+] as const;
+
 const CompositeScoreDisclaimer = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -73,58 +101,17 @@ const CompositeScoreDisclaimer = () => {
               Pillar Breakdown
             </h3>
             <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-slate-400 font-medium min-w-fit">
-                  25%
-                </span>
-                <div>
-                  <p className="text-slate-200 font-medium">
-                    Policy Environment
-                  </p>
-                  <p className="text-slate-400 text-sm">
-                    Regulatory frameworks and policy support for philanthropy
-                  </p>
+              {PILLAR_BREAKDOWN.map((pillar) => (
+                <div key={pillar.title} className="flex items-start gap-3">
+                  <span className="text-slate-400 font-medium min-w-fit">
+                    {pillar.weight}
+                  </span>
+                  <div>
+                    <p className="text-slate-200 font-medium">{pillar.title}</p>
+                    <p className="text-slate-400 text-sm">{pillar.description}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-slate-400 font-medium min-w-fit">
-                  25%
-                </span>
-                <div>
-                  <p className="text-slate-200 font-medium">
-                    Capital Accessibility
-                  </p>
-                  <p className="text-slate-400 text-sm">
-                    Availability and flow of philanthropic capital
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-slate-400 font-medium min-w-fit">
-                  25%
-                </span>
-                <div>
-                  <p className="text-slate-200 font-medium">
-                    Financial &amp; Technical Infrastructure Readiness
-                  </p>
-                  <p className="text-slate-400 text-sm">
-                    Financial systems, institutional capacity, and technological infrastructure capabilities
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-slate-400 font-medium min-w-fit">
-                  25%
-                </span>
-                <div>
-                  <p className="text-slate-200 font-medium">
-                    Talent Ecosystem
-                  </p>
-                  <p className="text-slate-400 text-sm">
-                    Availability of skilled professionals and expertise
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
